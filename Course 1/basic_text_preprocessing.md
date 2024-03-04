@@ -4,6 +4,7 @@
 - With NLP, the more interesting part is the feature engineering, this is because going from text to vectors isn't a trivial idea. 
 - There are many ways: bag of words, word embeddings, TFIDF, count vectorisers etc. 
 - The goal of this course, is to formally understand different text to vector transforms that are commonly used in industry. 
+- Once we have our vectors, we can build any supervised machine learning model of our choice to try and classify the text.
 
 ## Objective: Classify Tweets into Binary Sentiments:
 
