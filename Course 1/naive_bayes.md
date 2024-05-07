@@ -19,7 +19,7 @@
     <img src="./graphics/bayes_formula.png" width="700"/>
 
 
-    - Intuitavely the formula compares the proability that each word being positive vs negative. If the value of ths hypothesis function is > 1, this imples positive as the numerators are bigger than the denominator. Otherwise, if this value of the hypothesis function is less than 1, this implies a negative class. 
+    - Intuitavely the formula compares the proability that each word being positive vs negative. If the value of ths hypothesis function is > 1, this imples positive as the numerators are bigger than the denominator. Otherwise, if this value of the hypothesis function is less than 1, this implies a negative class. NClass below is the number of reviews belonging to that class and VClass is the number of classes. We know that if a word doesn't occur in a class, then the probability of that word is 0 and our classifier won't be able to classify the text. To this end, we apply a smoothing which adds 1 to each frequency, implying even if a word doesn't appear in the class, we count atleast 1. This prevents 0 probabilites (which can cause division by 0).
 
 
      <img src="./graphics/laplacian_smoothing.png" width="700"/>
@@ -40,8 +40,14 @@
 
 - Note: the training data for Naive Bayes should be cleaned: 
     - remove punctuation
+    - remove stopwords
     - lowercase letters
     - stemming
     - tokenization. 
+
+## Naive Bayes Assumptions:
+- Assume that the features are independent. This seems unlikely in the case of sentiment analysis: eg: p("negative" | "rubbish) != p("negative"). 
+- We assume frequency words dictionaries are balanced and represent the distribution of words at inference time. 
+- NB is better when we have balanced datasets. 
 
 
