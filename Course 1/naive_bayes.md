@@ -19,10 +19,15 @@
     <img src="./graphics/bayes_formula.png" width="700"/>
 
 
-    - Intuitavely the formula compares the proability that each word being positive vs negative. If the value of ths hypothesis function is > 1, this imples positive as the numerators are bigger than the denominator. Otherwise, if this value of the hypothesis function is less than 1, this implies a negative class. NClass below is the number of reviews belonging to that class and VClass is the number of classes. We know that if a word doesn't occur in a class, then the probability of that word is 0 and our classifier won't be able to classify the text. To this end, we apply a smoothing which adds 1 to each frequency, implying even if a word doesn't appear in the class, we count atleast 1. This prevents 0 probabilites (which can cause division by 0).
+    - Intuitavely the formula compares the proability that each word being positive vs negative. If the value of ths hypothesis function is > 1, this imples positive as the numerators are bigger than the denominator. Otherwise, if this value of the hypothesis function is less than 1, this implies a negative class. NClass below is the number of words (non distinct) belonging to that class and VClass is the number of unique words in that class. We know that if a word doesn't occur in a class, then the probability of that word is 0 and our classifier won't be able to classify the text. To this end, we apply a smoothing which adds 1 to each frequency, implying even if a word doesn't appear in the class, we count atleast 1. This prevents 0 probabilites (which can cause division by 0).
 
 
      <img src="./graphics/laplacian_smoothing.png" width="700"/>
+
+
+    - Note: some alternatives use V (unique count of words independent of class): 
+
+    <img src="./graphics/laplacian_smoothing_alternative.png" width="700"/>
 
 
 - An issue caused by carrying out the products for large corpusses, is words with a small frequency will have a really small value, and a product of small numbers becomes even smaller, too small infact that our machines may not be able to store the value. We know that if our hypothesis function is > 1, we predict 1, otherwise 0. It makes sense to take adapt this hypothesis function to use log-likelihood instead. This is because of the logarithmic rules: 
