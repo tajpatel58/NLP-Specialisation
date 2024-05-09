@@ -40,8 +40,11 @@
 - We can see the second term of our log-likelihood is the same of the logs of the quotients of p(w|positive)/p(w|negative). We call this the **lambda** value of a word. Thus for each word we can create a **lambda** dictionary
 - Formally the hypothesis function: 
     - Don't forget the log-prior value (missing in pictue below).
+    - We sum the loglikehoods for each word in our text:
 
      <img src="./graphics/nb_hypothesis_func.png" width="700"/>
+
+     - By summing over the likelihoods, each word is treated independently, therefore if we have "not good" the likelihood of "good" may overpower the likelihood of "not", leading to the text being classified as "positive". This is a limitation of Naive Bayes. 
 
 - Note: the training data for Naive Bayes should be cleaned: 
     - remove punctuation
