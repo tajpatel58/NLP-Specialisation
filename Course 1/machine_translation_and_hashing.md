@@ -32,6 +32,7 @@
 ### Locality Sensitive Hashing:
 
 - A brief detour in Linear Algebra:
+    - Recall, planes are 1 dimension lower than the dimension of the vector space and is uniquely defined by its normal vector and an intersection point. 
     - If we have a plane, then we can work out the normal to this plane (P = Normal).
     - The key takeaway is that if P.v > 0, then the point v lies on the side of the plane that P is facing. If P.v < 0, then the point lies on opposide side of the plane. 
     - This is useful as we can use planes to cluster points together. 
@@ -42,23 +43,33 @@
     - For each region, we can encode it by considering which side of each plane the region lies in.
     - Then for each vector, we can work out the encoded value for the region the vector belongs in and use this as a table. 
     - Let's say we have a new vector that we want to find the nearest word embedding. We workout the encoded region value and search the closest one amongst the word embeddings with the same encoded region value. 
+    - We search this sub-region and pick the datapoint with the closest distance (typically we measure distance with cosine similarity). 
+    - Note with the logic, the solution is an approximation as the planes might be setup in a way where the closest point is actually in another region, due to the speed this is okay. An intuitive explanation is if we were in Unites States and had 2 friends there, if we wanted to find the closest friend of ours, there's no gurantee this person is in the states as they could be in Canada. 
 - This is called Locality Sensitive Hashing, as the hash value is based on the distance between our inputs. 
     - We first construct "suitable" planes to divide by our vector space. (say we have N planes). Note we can construct planes by using the normal to a plane, we don't explicity need the equation of the plane. Eg the vector (1, 0), encodes the y-axis as (1,0) is perpendicular/normal to the y-axis. 
     - For each vector we compute the dot product with the normal vector of each plane. (telling us which side of the plane it belongs to)
-    - Each vector we encode with an N dimensional vector, made up of ones and zeroes, based on if it lies on the positive normal side (1) or negative normal side (0). 
+    - Each vector we encode with an N dimensional vector, made up of ones and zeroes, based on if it lies on the positive normal side (or on the plane) (1) or negative normal side (0). 
     - We can map this N dimensional vector to a number which is an encoded value for that region (all vectors in that region will map to this one value).
 - Formally the hash function here is: 
+
+
+Approximating Number of Planes Needed:
+- Note: If we have N planes, then we have 2^N buckets/regions. 
+- Suppose we have m vectors, we can say we roughly want alpha vectors per region, thus m/alpha is the number of regions we need. Thus take the smallest integer N > log_2(m/alpha)
 
 <img src="./graphics/hash_function_vectors.png" width="700"/>
 
 - Given some planes in our vector space, we can now do a fast search of a vector to the nearest word embedding. 
 - The question now becomes how do we choose the optimal planes/number of planes? 
     - Again, planes are encoded by their normal vector. To draw the seperation plane, we can apply a rotation matrix. 
-- Well, we can't exactly know the best planes to use as it's not a problem that's easy to pose/solve. Instead we create many sets of planes (lets call it M).
+- Well, we can't exactly know the best planes to use as it's not a problem that's easy to pose/solve. Instead we create many sets of planes (lets call it M), each set of planes could also be called a "universe", as each set corresponds to a diffferent way of breaking up a vector space. 
 - For each set of planes, we create the hash table, and use the hash function to find the region with nearest vectors/word embeddings. Each plane, might give a slightly different set of vectors (so more vectors to search) but it still reduces our vector search space to a subset of all embeddings.
 - Nn the below suppose we're trying to find the closest embedding to the purple point: one set of planes might yield the closest embeddings as the green points, another embedding might yield the orange and a 3rd set might yield the blue points. 
 - We've still reduced our search space and doing so creates a more robust/sure way that we've found the "closest" embedding. 
 - This is called "Approximate Nearest Neighbours". 
+- We can see if we have many sets of planes, then we wound spend time computing hash table values but we would be more sure that we've found the nearest embedding. If we used less sets of planes, search would be much quicker but we're less sure we've found the nearest embedding. 
+- There is always a trade off, and one thing to do would be to plot "number of planes" against accuracy, and choose the number of planes using the elbow method. 
+- In reality we want to use K-Nearest-Neighbours we call it "Approximate Nearest Neighbours" as we're finding the approximate nearest datapoints. 
 
 <img src="./graphics/multiple_sets_of_planes.png" width="700"/>
 
