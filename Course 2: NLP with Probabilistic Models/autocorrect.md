@@ -30,3 +30,24 @@
 - Suppose we phrase our problem as how can we compare 2 strings, well we can workout the smallest numbers of edits needed to take one word to another. 
 - We can imagine this is a complex operation when we have lengthy strings. To this end, we go through a dynamic programming approach which will improve the time complexity. 
 
+### Dyanmic Programming Approach to Minimum Edit Distance:
+- Our goal is to construct a table like below, which will depict how many operations it takes to go from one substring of a string, to a substring of another string. Remark: these substrings that we take are only from the start of the string. 
+- You'll notice that the bottom right corner element is the minimum edit distance from the entire first string to the entire second string. (which is exactly what we're looking for).
+- By filling this table iteratively, we will break the overall problem down into sub-problems. (this is how dyanmic programming works - a bit like binary search)
+- Note: the table below has hashes (which represent empty strings). The splices of strings are endpoint included. 
+
+<img src="./graphics/dynamic_programming_med.png" width="700"/>
+
+- There are usually multiple ways to go from one substring to the other, we can create all the paths and set the matrix entry to be the minimum distance of the paths.
+- Creating the first row/column is very straight forward. Once we have that, we can then update each matrix entry iteratively using the following update method: 
+
+
+<img src="./graphics/med_algo.png" width="700"/>
+
+
+- Suppose we have 2 strings that we want to know the minimum edit distance. Let's think of each string as a list (x and y) where each element is a character. 
+    - If we know the minimum distance between x[:-1] and y then we only need to insert 1 to get the distance from x to y.
+    - If we know the minimum distance between x and y[:-1], then we only need to delete 1 to get the distance from x to y
+    - If we know the minimum distance from x[:-1] and y[:-1], then we only need to at most replace to get from x to y. I say at most as if the added letter to both strings is the same, then no need to replace. 
+- Note: you might have values elsewhere in the grid that are bigger than your overall minimum edit distance. This is because some methods enforce a deletion then insert when in reality you don't always need to do this. (eg in the case the extra letters are the same).
+- Note that this algorithmn doesn't tell you the path taken from start to finish, if we were interested in this, then we need to implement a method called "backtrace". 
