@@ -59,3 +59,58 @@
     - The first being slightly incorrect as "love" is a verb in this sentence. 
 - Our prediction method is to pick the path that gives the highest probability. Note we multiply the transition and emission probabilities when going between words. 
 To this end, we will go through the Viterbi algorithm, which is a graph algorithm which helps us find the path with the higest probability. 
+
+
+### Step 4: The Viterbi Algorithm: 
+- As mentioned above, the Viterbi algorithm is a dynamic programming algorithm that will help us find the path with the highest probability. So that we can assign tags to pieces of text with the highest probability. 
+- Intuitavely the Viterbi algorithm creates 2 matrices both with dimensions $(n$ x $l)$, where $l$ is the length of the text we're trying to assign speech tags to:
+    - One matrix keeps track of the probabilities that each word in our text belongs to a particular state/tag. 
+    - One for keeping track of which state the previous word was assigned used which gave the highest probability of the current state. 
+
+- The Viterbi Algorithm created these 2 matrices (called C, D) and is broken into 3 steps: 
+    - Initialisation (starting matrix creation - setting first column)
+    - Forward Pass (assembling matrices, column wise priority)
+    - Backward Pass (finding the optimal path)
+
+- Note again: both matrices have dimensions $(n$ x $l)$, we can think of the ($i^{th}, j^{th}$) entry corresponding to some relationship between the $i^{th}$ state and the $j^{th}$ word in our text
+
+#### Initialisation - First Columns:
+- We initialise the first column of D to be zero, this is because there are no words preceeding the first word. 
+- $C_{i,1}$ is the probability that the first word is emitted from the $i^{th}$ state. To be emitted from $i^{th}$ state, we need go from the initial state, to the $i^{th}$ state, then be emitted to the word. 
+- In the below diagram, consider b to correspond to the emission matrix. 
+
+- <img src="./graphics/viterbi_initialisation.png" width="700"/>
+
+
+#### Forward Pass - Remaining Columns:
+- For the remaining columns of the C matrix:
+- $C_{i,j}$ is the highest probability path (across all paths) that we end up at state ($i$), for the $j^{th}$ word. This is calculated iteratively, column wise:
+    - We know from initialisation, that the first column is the probability of being emitted to the first word from various states. 
+    - For the second column, entries $C_{i,2}$, will be the largest probability that the second word belongs to state $(i)$, which is also equal to the maximum of: "P(being at state k for first word) * tranisition from state $(k)$ to state $(i) * $ P(emitting word $j$ from state $(i)$).
+    - Doing this, the second column holds the highest probability paths, which we can repeat iteratively. 
+- This corresponds to taking the maximum of $"c_{k, j-1}t_{k, i} * b_{i, index(j)}"$ for any $k$ where t corresponds to transition matrix, and b corresponds to emission matrix. 
+- Further, we set entries of D as: $D_{i,j}$ to be the state from which we travelled which maximised the probability at $C_{i,j}$
+- Formally: 
+
+- <img src="./graphics/forward_pass_viterbi.png" width="700"/>
+- <img src="./graphics/forward_pass_d_viterbi.png" width="700"/>
+
+
+#### Backward Pass - Final Path: 
+- Thus once we have the 4 matrices:
+    - Transition Matrix (A)
+    - Emission Matrix (B)
+    - Maximum Probability (C) Path Matrix
+    - Backtracing (D) Matrix. 
+- We can find the overall path with the highest probability for this text:
+    - First we go to the final column of C and find the entry/state with the highest probability (this is the state of the final word)
+    - We then go to the same indexes but in the D matrix, which will tell us the state of the previous word, which leads to the highest probability in the final column
+    - Repeat for the second to last column.... 
+    - Eventually building a path of states which is the equivalent of labelling our piece of text. 
+- Formally: 
+- <img src="./graphics/backward_pass_viterbi.png" width="700"/>
+
+
+## Conclusion: 
+- Now we know how to tag POS (Part of Speech), using Hidden Markov Models.
+- Python Notes: it's wise to use log probability when taking products in the C matrix as storing really small values gets computationally expensive. 
