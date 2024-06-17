@@ -11,7 +11,7 @@
 - LSTMs apply the idea of remembering relevant information and discarding less useful information. 
 - LSTMs is made up of gates:
     - Input Gate: tells how much information to input. 
-    - Forest Gates: how much information to forget.
+    - Forget Gates: how much information to forget.
     - Output gate: how much information to pass over. 
 
 
@@ -34,3 +34,47 @@
 - Run the output through a dense layer.
 - Predict using **LOG** softmax over all tags/named entities. Note: its important to use log softmax as it provides better numerical performance and gradient optimisations. 
 - Note: be careful when evaluating padding tokens as these are contained within our inputs and outputs. We don't want to inflate our accuracy unncessarily. So when checking if our labels are correct, don't include these. 
+
+
+## LSTM Layer (Own Notes):
+- LSTMs are good for time series data/sequential data. 
+- We can use LSTM layers within a network it is simply a way of taking an input vector, applying a sequence of operations and outputting another vector. 
+- A RNN will:
+    - Initialise a hidden state. 
+    - Apply a matrix to the current input as well as the initial hidden state.
+    - Apply some activation funcion then set this as the hidden state for the next layer.
+    - Make a prediction on the current layer. 
+    - Each layer prediction is a prediction for the next input. 
+- LSTMs incorporate a similar idea. 
+
+- <img src="./graphics/lstms_stat_quest.png" width="700"/>
+
+### Initialisation:
+- Initialise the long term memory value and the short term memory value. (Both of which are recalculated at the end of an LSTM unit).
+- In the below, treat $X$ as input and $S$ as short term memory. 
+
+### Forget Gate (1st Component In Image):
+- We take in the input which passes through a weight parameter: $(W_{input:forget} * S)$.
+- Apply another weight parameter to the short term memory matrix/value. $(W_{short:forget} * X)$.
+- We sum these 2 and pass through a sigmoid function which maps between $(0,1)$. This corresponds to the percentage of the long term memory we want to retain. 
+- Hence the name "forget gate" as we are determining how much of the long term memory we use in the final prediction. 
+
+### Input Gate (Middle 2 Components in Image):
+- Apply another weight parameter to the input: $(W_{input:input} * X)$
+- Apply another weight parameter to the short term memory: $(W_{short:input} * S)$
+- Sum these 2 outputs and apply a sigmoid function, which again maps to $(0,1)$ as the percentage of current memory to remember for the long term.
+- We then have another set of matrix that do something similar but we apply the $tanh$ activation function instead, this will give us the potential long term memory contribution. 
+- Multiplying this with the % of current memory to remember we calculated, we get the value of the "long term memory" value used in the next layer. 
+- This layer will update the long term value with the information from this input. 
+
+### Output Gate (4th and 5th Component in Image):
+- - Apply another weight parameter to the input: $(W_{input:short} * X)$
+- Apply another weight parameter to the short term memory: $(W_{short:short} * S)$
+- Sum these 2 outputs and apply a sigmoid function, which again maps to $(0,1)$ as the percentage of current memory to remember for the short term. 
+- We then have another set of matrix that do something similar but we apply the $tanh$ activation function instead, this will give us the potential short term memory contribution. 
+- Multiplying this with the % of current memory to remember we calculated, we get the value of the "long term memory" value used in the next layer. 
+- This layer will update the short term value with the information from this input, which is fed as the short term value in the next LSTM unit. 
+
+### General Comments
+- The above describes a single LSTM unit, we would repeat the above for every input in our vector. 
+- The idea is part of the old data is retained by this long term memory but also gets rid of the exploding gradient problem. 
