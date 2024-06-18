@@ -78,3 +78,4 @@
 ### General Comments
 - The above describes a single LSTM unit, we would repeat the above for every input in our vector. 
 - The idea is part of the old data is retained by this long term memory but also gets rid of the exploding gradient problem. 
+- As the long term memory is retained, which is made up of the contributions of each input, the final prediction is made up of a summary of the inputs. (which is what we want from RNNs). 
