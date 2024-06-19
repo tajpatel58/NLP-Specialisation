@@ -89,3 +89,61 @@
  - This is where teacher forcing comes in, where we will use the correct word as input into the next set of LSTMs instead of the predicted word. 
  - This makes training much faster, and improves performance.
  - There are slight variances of Teacher Forcing, one such is in the first few generated words we always feed in the correct word but later on in the sequence we pass in the predicted words. This technique is called Curriculumn Learning. 
+
+ ## Neural Machine Translation: 
+ -  <img src="./graphics/neural_machine_translation.png" width="1000"/>
+ - In the architecture above we have a "shift right" this is to introduce a start/end of sequence token. 
+ - The pre-attention decoder is setup so we can compute the hidden states of the decoder BEFORE attention is added. This is so we can generate our Queries, Keys, Values matrices, needed for attention. 
+ - In the pre-attention decoder, we must use teacher forcing, as we won't be computing probabilities/feeding into the fully connected layer. (only the LSTM structure.)
+
+
+ ## Evaluating NMT Models: 
+ - We know how to feed a sequence in to get a sequence out, but what metric do we use to evaluate how good our model is? 
+ 
+
+ ### BLEU Score: 
+ - The BLEU score compares the generated sequence with some reference sequences.
+ - Reference sequences are typically human generated.  
+ - For each word generated it adds a count if the word appears in the reference, but doesnt add multiple counts for the same word. Then divides by the total length of the sequence generated. 
+ - This is a rather basic metric. 
+ - It doesn't consider semantic meaning, eg if the sequences mean the same as the reference just slightly different words. Eg:
+    - Generated: I am really hungry.
+    - Reference: I coudld eat a lot of food.
+- Nor does it consider the order of a sequence, the below would produce a perfect Bleu score, but in reality is a poorly generated text:
+    - Generated: Hungry am really I. 
+    - Reference: I am really hungry. 
+
+
+### Rouge-N Score: 
+- Can be thougt of as recall.
+- Looking at your reference sentences, calculate a BLEU score with the reference and the generated text as the candidate. (ie the other way around). This is called the ROUGE-N Score.
+- The N relates to Ngrams, where instead of just looking if words are present, we see if N-grams are present. This improves upon the BLEU in the sense it considers orders of words. 
+- We can then combinate Rouge-N and BLEU like we do with precision and recall to get an F1 Score. 
+- $F_1 := 2\frac{bleu \text{ * } rougen}{bleu \text{ + } rougen}$
+- Though the Rouge-N score and Bleu don't really consider order/semantic meaning. 
+
+## Sampling + Decoding: 
+- We know the decoder will feed the output of the LSTM into a fully connected layer, which will then output some probabilities. 
+- However, choosing the word with the highest probability doesn't always generate the most realistic text. This is usually a problem when we have longer sequences. 
+- Suppose we have a vector of probabilities, and we want to select a word as the output of this step: 
+    - Greedy Approach/Highest Probability: Selecting the word with highest probability, can make models deterministic and may not generate the most accurate text. 
+    - Random Sampling: Sample a word, based on the discrete distribution provided by the probability vector. 
+    - Temperature: We discussed temperature before, but the idea is temperature introduces some randomness to the words we select, and therefore we don't always pick the highest probability word. Temperature is a hyperparameter between 0 and 1. 
+
+
+### Beam Search: 
+- Beam search is a better approach to selecting words.
+- It doesn't just consider the word, but considers the reprocussions of selecting that word by considering the probability of the sequence as a whole. 
+- One of the hyperparameters is called Beam Width, which defines the number of sequences we keep track of/number of terms we look ahead to. 
+- We keep track of the probability of B sequences, until we reach the end of sentence token OR we've reached our beam width. Then in the end we choose the sequence with the largest probability. 
+- We can use the Decoder to compute the conditional probabilities. However we need to run the model B (beam width) times as we need to compute different conditional probabilities. 
+- Eg if we want P(w3|"My Name"), we need to feed start of sequence token, then "My", then "Name" into the decoder LSTMS. 
+- This can become quite computationally heavy.
+- Furthermore this method penalises longer sequences as the product of terms between (0, 1) tend to zero. ie: shorter sequences is the product of fewer small numbers and is in general more likely to produce higher probabilities vs longer sequences. To this end, we can normalise the probability by the number of words in the sequence. 
+
+
+### Minimum Bayes Risk: 
+- Create many reference sequences (maybe by human).
+- Then generate many sequences from the decoder and select the decoder generated sequence with the highest average similarity across the reference sequences. 
+- The similarity here can be calculated using the rouge-n score. 
+- This is better than random sampling and greedy decoding. 
