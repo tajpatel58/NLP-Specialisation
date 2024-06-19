@@ -29,7 +29,7 @@
 - The below shows a seq2seq model where:
     - We predict the spanish translation for english text. 
     - Word Embeddings are 2 dimensional.
-    - We have 2 layers LSTMs and 2 depths of LSTMs. 
+    - We have 2 layers LSTMs and 2 depths of LSTMs. (must be same on both Encoder/Decoder side)
 <img src="./graphics/seq2seq.png" width="1000"/>
 
 - The original Seq2Seq Model had:
@@ -45,3 +45,6 @@
 - The trick here is to take a weighted sum of all the hidden states in the encoder (we get a short term and long term state) after every input word. Thus if 20 input words, 20 hidden states. We take a weighted sum of the hidden states and then output the contect vectors which are fed into the decoder. 
 - By taking a weighted average, we allow for older information to be carried over. We optimize the weights of each hidden state, doing so determines which words in inputs are more important. 
 - Note these weights will vary based on the number of states you have and thus the number of input words you have. 
+
+### Attention Layer: 
+- 

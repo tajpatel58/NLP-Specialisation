@@ -10,9 +10,17 @@
 - LSTMs are a way of getting around this. 
 - LSTMs apply the idea of remembering relevant information and discarding less useful information. 
 - LSTMs is made up of gates:
-    - Input Gate: tells how much information to input. 
-    - Forget Gates: how much information to forget.
-    - Output gate: how much information to pass over. 
+    - Forget Gates: what information from the previous state we want to use. 
+    - Input Gate: 
+        - What information from the current state we want to use in the LONG term. 
+        - 2 Steps: 
+            1. What % of information from current state do we want to keep. (% Potential to Remember)
+            2. What the information we might add to the long term memory. (Potential Long Term Memory)
+    - Output gate: 
+        - Calculates what information from the current state we want to use in the SHORT term.
+        - 2 Steps: 
+            1. What % of information from current state do we want to keep. (% Potential to Remember)
+            2. What the LONG TERM information is we might add to the short term memory. (Potential Short Term Memory)
 
 
 ## Named Entity Recognition (NER): 
@@ -79,3 +87,37 @@
 - The above describes a single LSTM unit, we would repeat the above for every input in our vector. 
 - The idea is part of the old data is retained by this long term memory but also gets rid of the exploding gradient problem. 
 - As the long term memory is retained, which is made up of the contributions of each input, the final prediction is made up of a summary of the inputs. (which is what we want from RNNs). 
+- We use sigmoid activations to approximate what % of information is used and tanh activations when we want to summarise the information. 
+- A slightly better explanation of the LSTM unit can be depicted below:
+
+## LSTM Hyperparameters and Dimensions:
+
+- <img src="./graphics/lstm_architecture.png" width="700"/>
+
+- From the above we can see that the hidden state dimensions can be different to word embedding size. 
+- The output units size is a key hyperparameter as it determines the dimensions of most of the matrices. It also determines the dimensions of the hidden states. (both short term and long term states).
+- We call hidden state as referring to the previous short term state and cell state referring to the previous long term state. 
+- Bias terms are optional are applied after weights matrix but before activation function. $g(WX + b)$
+- Suppose our word embedding/input has dimension: $m$ and the output units size is $n$
+- We concatenate the vector of the previous hidden state and the input to produce of vector of dimension: $(m+n)$
+- We apply a series of matrices in each gate:
+
+### Forget Gate:
+- $W_{forget} \in R^{\text{ } n \text{ x } (m+n)}$ 
+- $b_{forget} \in R^{\text{ } n}$
+- Thus a total of $(n^2 + mn + n)$ parameters.
+
+### Input Gate:
+- $W_{input,percentage} \in R^{\text{ } n \text{ x } (m+n)}$ 
+- $b_{input,percentage} \in R^{\text{ } n}$
+- $W_{input,longterm} \in R^{\text{ } n \text{ x } (m+n)}$ 
+- $b_{input,longterm} \in R^{\text{ } n}$
+- Thus a total of $2(n^2 + mn + n)$ parameters.
+
+### Output Gate:
+- $W_{output,percentage} \in R^{\text{ } n \text{ x } (m+n)}$ 
+- $b_{output,percentage} \in R^{\text{ } n}$
+- Thus a total of $(n^2 + mn + n)$ parameters.
+- Recall Output gate is applied to the new long term memory after the input gate has updated the long term memory state. 
+
+*Total of: $4(n^2+nm+n)$ parameters in a LSTM unit*
