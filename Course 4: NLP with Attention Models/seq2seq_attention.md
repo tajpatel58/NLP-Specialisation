@@ -64,3 +64,28 @@
 - Here we notice that we would largely benefit from having a matrix of similarity scores. I.e. a matrix that stores the dot product of hidden states on the encoder and decoder side. This will allow us to calculate probabilities quicker and thus build the attention mechanism quicker. 
 - When speaking about attention models, "Alignment" is also a term referring to how similar 2 vectors are.
 - One of the pro's of this method as it considers all words in the sequence, not just in a particular order. 
+
+
+## Keys, Values and Queries: 
+- We can see in the attention mechanism, we need the similarity scores of all the hidden states on the encoder and decoder side. Which we can then apply softmax on and then retrieve the weighted context vector which is added as input to the fully connected layer. 
+- We store this information as queries (Q), keys (K) and values (V) pairs, which gives us a faster retrieval/calculation. 
+- Attention(Q, K, V) = $softmax(\frac{QK^T}{\sqrt(d_k)})$
+- Note we scale the product of queries and keys by the square root of the length of the key-vector size, this is found to imporve performance.
+- Suppose we have $n_{query}$ queries and $k$ hidden states on the encoder side, $n$ dimensional LSTM output units. 
+    - Q: Queries: Decoder side hidden state vector. (hidden states are stored as rows) ($\in R^{n_{query} \text{ x } n}$)
+    - K: Keys: All encoder side hidden states. (hidden states are stored as rows) ($\in R^{k \text{ x } n_{query}}$)
+    - V: Values: Encoder side hidden states where weighted average is taken. (rows again) ($\in R^{k \text{ x } n_{query}}$)
+    - We can see K and V are similar. 
+- For the way we implment attention V and K are basically the same, however there are other ways to calculate attention where we may use different values. 
+- We can see that $Q*K^T$ is an $R^{n_{query} \text{ x } k}$ matrix, where the rows are the weights for the hidden states. 
+ 
+
+ ## Teacher Forcing: 
+ - Recall generation happens on the decoder side by feeding the first predicted word as input to the set of LSTMs, to then predict the next word and this loops until we get the end of sentence token. 
+ - Hence it's important when preprocessing our data to have an EOS token. 
+ - Sometimes we also use start of sentence token but the original paper used an EOS token. 
+ - Part of the problem here is that once a generated/predicted word is incorrect, these errors can propogate easily. 
+ - Errors tend to happen early on in the model as the model is naive at the start.
+ - This is where teacher forcing comes in, where we will use the correct word as input into the next set of LSTMs instead of the predicted word. 
+ - This makes training much faster, and improves performance.
+ - There are slight variances of Teacher Forcing, one such is in the first few generated words we always feed in the correct word but later on in the sequence we pass in the predicted words. This technique is called Curriculumn Learning. 
