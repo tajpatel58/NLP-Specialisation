@@ -143,7 +143,7 @@
 
 
 ### Minimum Bayes Risk: 
-- Create many reference sequences (maybe by human).
-- Then generate many sequences from the decoder and select the decoder generated sequence with the highest average similarity across the reference sequences. 
+- Take several generated sequences.
+- For each sequence compare its similarity against the other samples and take the average. The sequence with the highest similarity is our prediction. 
 - The similarity here can be calculated using the rouge-n score. 
 - This is better than random sampling and greedy decoding. 
