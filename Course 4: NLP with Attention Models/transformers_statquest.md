@@ -26,7 +26,7 @@
 - The intuitive idea is the same as before, we want to emphasise on important words within the sentence. However in this case, we also apply the attention mechanism to the words in the input sequence. Ie: We alter the encoding of a word in a sequence based on the other words in the sequence. This is because words in the input sequence may relate to each other and we want the model to pick up on this to adjust the output encoding accordingly. 
 - Eg: "I got my car straight from the showroom, it was new", we want "it" to relate more to the word "Car" than "showroom" as that's what it refers to. 
 - Suppose our word embedding is $n$ dimensional, have $k$ words, we'll repeat the following for every word embedding: 
-    1. Apply 3 dense layers (output dimension = $n$, thus all $(n \text{ x } n)$ matrices):
+    1. Apply 3 **LINEAR** layers (output dimension = $n$, thus all $(n \text{ x } n)$ matrices):
         - One layer will output the query(Q) for a word.
         - One layer will output the key(K) for a word.
         - One layer will output the value(V) for a word. 
@@ -43,6 +43,7 @@
 ## Residual Connection:
 - After an attention cell, we will add the output vector with the input vector to the attention mechanism. 
 - This is because the attention mechanism will find it hard to preserve the information from the other words, word embedding and the positional encoding as well as the input. 
+- Residual connections are particularly useful for the vanishing gradient problem. If we use Relu activations, then any negative value will have gradient 0 and thus the information being carried is lost. Hence we add the original vector back to reduce 0 values. 
 - We want attention to focus on relationships between words not necessarily the word itself. 
 - Formally: 
 $$ v := v_{attention} + v_{attention:input}$$
@@ -84,3 +85,25 @@ $$ v := v_{attention} + v_{attention:input}$$
 -  <img src="./graphics/transformer.png" width="1000"/>
 
 - Note one trick to handle varied sequence length is to normalise each vector after each component in the transformer. 
+- The above is one possible transformer architecture but we can have many variations on it. The main idea is to use attention mechanisms. 
+- Below is the T5: Text to Text Transformer architecture. 
+- Some differences: 
+    - We have some normalisation steps. 
+    - Have a feed forward layer.
+    - Repeating the encoding/decoding steps many times. (with different parameters, which is why parameters can scale very quickly)
+
+-  <img src="./graphics/t5_architecture.png" width="1000"/>
+
+
+### Layers: 
+- A Linear layer is a single matrix multiplication layer, with no activation.
+- A Dense layer is a single matrix multiplication layer, but can have an activation. 
+- A Feed Forward layer is a collection of Dense layers, and thus will have multiple matrix operations/activations applied to the input. 
+
+### Parameters:
+- Due to the variety of transformer architectures there's no 1 set number of parameters, however we can note some general parameters down. 
+- Every attention mechanism will generate queries, keys, values through a linear layer for each. This is an introduction of $3n^2$ parameters. ($n$ := embedding dimension). Multihead attention will vary this number slightly as we reduce the matrix sizes but then also have more matrices. This is where we decide to use word embeddings of the sizes: $2^j$ and number of heads in Multihead attention to also be a power of 2. This gives easy division and our vector sizes are preserved. 
+- As an idea, Llamma 70B uses word embeddings of size 8192. Leading to 200M parameters just on 1 attention mechanism. 
+- Llamma-70B is built with 32000 tokens, thus as the word embeddings are trained in the model, and should have dimension 8192, this is 260M parameters.  
+- So we start to see how quickly these parameters can grow. 
+- We also run the decoder many times, (N times), each wit a different set of parameters, which again, causes a huge increase in parameters. Note: **Running through the decoder N times, is done in parallel NOT sequentially**. Ie, can think of a stack of decoders. 
