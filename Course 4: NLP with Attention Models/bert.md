@@ -69,3 +69,31 @@
 - The T5 Model Architecture built is very similar to the transformer architecture we've seen before. It indeed uses Encoder-Decoder modelling with 12 stacked Encoders/Decoders each. (220 million parameters)
 - We train it by using the same masking technqiue, but masking multiple words from a sentence. We then have a sequence input which is the sequence without the masked words and the output is the masked output. 
 - We consider the loss here to be only for the error in generating the masked tokens not the whole output. (just like we did with BERT pretraining)
+
+## MultiTask Training Strategy: 
+- We'd want to use language models for multiple tasks:
+    - Question Answering
+    - Classification
+    - Named Entity Recognition
+- We build a model capable of doing this by taking a subset of training data from each of these tasks. (ie: we make our training data for the model by mixing the kinds of data - that way the loss is made up of a combination of it's performance on different tasks).
+- We then evaluate our model on each task as a whole and then use the GLUE metric to get an "averaged" idea of general performance on NLP task. 
+
+### Fine Tuning: 
+- To fine tune, we can add various layers to the model to assess it's performance on the exact task we're looking for. 
+
+#### Gradual Unfreezing Layers:
+- This is where we freeze all the layers in the network apart from the last layer. Meaning that only the parameters in the last layer can be adapted for performance. 
+- Then we unfreeze the last and second last layers, then assessing performance. 
+- Iteratively carrying on down till all layers are unfrozen. 
+
+#### Adapter Layers:
+- Introducing new feed forward layers within the encoders/output layers, which adds more trainable parameters to our model, allowing for adaptability to our use case. 
+
+### GLUE: General Language Understanding Evaluation:
+- A metric used to evaluate a models performance towards general NLP tasks. 
+- Types of tasks:
+    - Sentiment
+    - Similarity
+    - NER
+    - Is this sentence a contradiction of itself? 
+- We can then compare models based on their GLUE score - which is something like ChatGPT will be compared against. 
