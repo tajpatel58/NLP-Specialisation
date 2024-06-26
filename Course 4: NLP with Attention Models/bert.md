@@ -39,6 +39,7 @@
 - The BERT model is trained using a "Masked Language Model" (MLM), which is where we try to predict words given the surrounding words (similar to CBOW). This model will mask a fixed percentage of words (eg: 15%), then try to predict the masked words. (can think of masking as covering). 
 - BERT is already trained on NSP (Next Sentence Prediction), given 2 sentence to determine whether one follows the other. This way BERT learns the relationship between sentences and predicts the next sentence given the first one.
 - BERT is used in Google Search. 
+- PreTraining refers to the steps before the model is optimized for our specific task. In particular it's where we train general features before fine tuning to our problem. 
 - Formally, for training: 
     - We train the NSP and Masked LLM simultaneously. 
     - We feed into BERT a sentence that is concatenated with the 2 sentences (whether it's question, answer OR 2 sentences next to each other). Therefore we can think number of inputs as: 1(start of sentence token) + len(sentence 1) + 1 (seperator) + len(sentence 2)
@@ -69,6 +70,9 @@
 - The T5 Model Architecture built is very similar to the transformer architecture we've seen before. It indeed uses Encoder-Decoder modelling with 12 stacked Encoders/Decoders each. (220 million parameters)
 - We train it by using the same masking technqiue, but masking multiple words from a sentence. We then have a sequence input which is the sequence without the masked words and the output is the masked output. 
 - We consider the loss here to be only for the error in generating the masked tokens not the whole output. (just like we did with BERT pretraining)
+- T5 model uses the Prefix Language Model Attention Mechanism: 
+    - This means that for the inputs we use bidirectional attention. 
+    - Causal Attention (attention only on what's been seen previously) on the outputs. Ie: attention on the inputs as well as the outputs generated before the current time step. 
 
 ## MultiTask Training Strategy: 
 - We'd want to use language models for multiple tasks:
@@ -77,6 +81,7 @@
     - Named Entity Recognition
 - We build a model capable of doing this by taking a subset of training data from each of these tasks. (ie: we make our training data for the model by mixing the kinds of data - that way the loss is made up of a combination of it's performance on different tasks).
 - We then evaluate our model on each task as a whole and then use the GLUE metric to get an "averaged" idea of general performance on NLP task. 
+- Temperature Based Mixing is a strategy used to mix different datasets, where we take a different weighted number from each dataset (where each dataset corresponds to a type of task).
 
 ### Fine Tuning: 
 - To fine tune, we can add various layers to the model to assess it's performance on the exact task we're looking for. 
